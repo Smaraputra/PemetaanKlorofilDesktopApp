@@ -8,11 +8,7 @@
 ###########################################################################
 
 import wx
-from wx.core import NO
 import wx.xrc
-import numpy
-from PIL import Image
-from pemetaanKlorofil import pemetaanKlorofil
 
 ###########################################################################
 ## Class FrameUtama
@@ -351,7 +347,7 @@ class FrameUtama ( wx.Frame ):
 		
 		sbSizer3 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Hasil Pemetaan" ), wx.VERTICAL )
 		
-		self.citra_hasil = wx.StaticBitmap( sbSizer3.GetStaticBox(), wx.ID_ANY, wx.NullBitmap, wx.DefaultPosition, wx.Size( 500,500 ), 0 )
+		self.citra_hasil = wx.StaticBitmap( sbSizer3.GetStaticBox(), wx.ID_ANY, wx.NullBitmap, wx.DefaultPosition, wx.Size( 450,450 ), 0 )
 		sbSizer3.Add( self.citra_hasil, 1, wx.ALL|wx.EXPAND, 5 )
 		
 		
@@ -381,175 +377,31 @@ class FrameUtama ( wx.Frame ):
 	
 	def __del__( self ):
 		pass
-	klorofil = pemetaanKlorofil()
-
-	def resizer(self, width, height, imgs, stats):
-		img = numpy.array(imgs)
-		if stats:
-			rgb = img * 32
-			pilImage = Image.fromarray(rgb).convert("RGB")
-			image = wx.Image(pilImage.size[0], pilImage.size[1])
-			image.SetData(pilImage.tobytes())
-		else:
-			pilImage = Image.fromarray(img).convert("RGB")
-			image = wx.Image(pilImage.size[0], pilImage.size[1])
-			image.SetData(pilImage.tobytes())
-		H = image.GetHeight()
-		W = image.GetWidth()
-		if (W > H):
-			height = height * H / W
-		else:
-			width = width * W / H
-		image = image.Scale(width, height)
-		return image
-
-	def showMessage(self, message):
-		dialog = wx.MessageDialog(None, message, "Info", wx.OK | wx.ICON_INFORMATION)
-		dialog.ShowModal()
-
-	def showMessageError(self, message):
-		dialog = wx.MessageDialog(None, message, "Error", wx.OK | wx.ICON_ERROR)
-		dialog.ShowModal()
+	
 	
 	# Virtual event handlers, overide them in your derived class
-	def ambil_bandqaOnFileChanged( self, event ):
-		newH = 120
-		newW = 120
-		path = event.GetPath()
-		isImage4 = self.klorofil.openImageQA(path)
-		if isImage4:
-			loadImage = Image.open(path)
-			image = self.resizer(newW, newH, loadImage, True)
-			bitmapImage = wx.Bitmap(image)
-			self.citra_bqa.SetBitmap(bitmapImage)
-		else:
-			self.showMessageError("Bukan File yang Valid!")
-		event.Skip()
-	
-	isImage4 = None
 	def filepick_band4OnFileChanged( self, event ):
-		newH = 120
-		newW = 120
-		path = event.GetPath()
-		self.isImage4 = self.klorofil.openImage4(path)
-		if self.isImage4:
-			loadImage = Image.open(path)
-			image = self.resizer(newW, newH, loadImage, True)
-			bitmapImage = wx.Bitmap(image)
-			self.citra_b4.SetBitmap(bitmapImage)
-		else:
-			self.showMessageError("Bukan File yang Valid!")
 		event.Skip()
 	
-	isImage5 = None
 	def filepick_band5OnFileChanged( self, event ):
-		newH = 120
-		newW = 120
-		path = event.GetPath()
-		self.isImage5 = self.klorofil.openImage5(path)
-		if self.isImage5:
-			loadImage = Image.open(path)
-			image = self.resizer(newW, newH, loadImage, True)
-			bitmapImage = wx.Bitmap(image)
-			self.citra_b5.SetBitmap(bitmapImage)
-		else:
-			self.showMessageError("Bukan File yang Valid!")
 		event.Skip()
 	
-	isImage6 = None
 	def filepick_band6OnFileChanged( self, event ):
-		newH = 120
-		newW = 120
-		path = event.GetPath()
-		self.isImage6 = self.klorofil.openImage6(path)
-		if self.isImage6:
-			loadImage = Image.open(path)
-			image = self.resizer(newW, newH, loadImage, True)
-			bitmapImage = wx.Bitmap(image)
-			self.citra_b6.SetBitmap(bitmapImage)
-		else:
-			self.showMessageError("Bukan File yang Valid!")
 		event.Skip()
 	
-	isSHP = None
+	def ambil_bandqaOnFileChanged( self, event ):
+		event.Skip()
+	
 	def ambil_shpOnFileChanged( self, event ):
-		path = event.GetPath()
-		self.isSHP = self.klorofil.openSHP(path)
-		if not self.isSHP:
-			self.showMessageError("Bukan File SHP!")
-		else:
-			self.isSHP = True
 		event.Skip()
 	
-	isOut = None
 	def dir_outputOnDirChanged( self, event ):
-		path = event.GetPath()
-		self.klorofil.setDirOutput(path)
-		self.isOut = True
-		event.Skip()
-	
-	def resetOnButtonClick( self, event ):
-		self.ambil_band4.SetPath("")
-		self.ambil_band5.SetPath("")
-		self.ambil_band6.SetPath("")
-		self.ambil_bandqa.SetPath("")
-		self.ambil_shp.SetPath("")
-		self.ambil_output.SetPath("")
-
-		bmp1 = wx.EmptyBitmapRGBA(500, 500, red=255, green=255, blue=255, alpha=1)
-		bmp2 = wx.EmptyBitmapRGBA(120, 120, red=255, green=255, blue=255, alpha=1)
-		self.citra_bqa.SetBitmap(bmp2)
-		self.citra_b6.SetBitmap(bmp2)
-		self.citra_b5.SetBitmap(bmp2)
-		self.citra_b4.SetBitmap(bmp2)
-		self.citra_hasil.SetBitmap(bmp1)
-
-		self.isImage4 = None
-		self.isImage5 = None
-		self.isImage6 = None
-		self.isSHP = None
-
-		self.longitude_end.Clear()
-		self.longitude_start.Clear()
-		self.latitude_end.Clear()
-		self.latitude_start.Clear()
-		self.sun_elevation.Clear()
-		self.reflectance_add.Clear()
-		self.reflectance_mult.Clear()
-
-		self.klorofil.reset()
 		event.Skip()
 	
 	def startOnButtonClick( self, event ):
-		if(self.isOut and self.isSHP and self.isImage6 and self.isImage5 and self.isImage4):
-			longstart = self.longitude_start.GetValue()
-			longend = self.longitude_end.GetValue()
-			latstart = self.latitude_start.GetValue()
-			latend = self.latitude_end.GetValue()
-			sun_elev = self.sun_elevation.GetValue()
-			ref_add = self.reflectance_add.GetValue()
-			ref_mult = self.reflectance_mult.GetValue()
-			if((longstart is None or longstart=='') or (longend is None or longend=='') or (latstart is None or latstart=='') or (latend is None or latend=='') or (sun_elev is None or sun_elev=='') or (ref_add is None or ref_add=='') or (ref_mult is None or ref_mult=='')):
-				self.showMessageError("Parameter Kurang/Salah!")
-			else:
-				newH = 500
-				newW = 500
-				self.klorofil.SetCropCoordinate(longstart, longend, latstart, latend)
-				self.klorofil.SetRefParameter(sun_elev, ref_mult, ref_add)
-				images = self.klorofil.mulaiPemetaan()
-				image = self.resizer(newW, newH, images, False)
-				bitmapImage = wx.Bitmap(image)
-				self.citra_hasil.SetBitmap(bitmapImage)
-		else:
-			self.showMessageError("Input Belum Lengkap!")
 		event.Skip()
 	
-class MainApp(wx.App) :
-   def OnInit(self):
-        mainFrame = FrameUtama(None)
-        mainFrame.Show(True)
-        return True
+	def resetOnButtonClick( self, event ):
+		event.Skip()
+	
 
-if __name__ == '__main__':
-        app = MainApp()
-        app.MainLoop()
